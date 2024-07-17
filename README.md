@@ -1,69 +1,54 @@
-<div align="center">
+# Wavy Sounds
 
-  <h1><code>wasm-pack-template</code></h1>
+## Description
+Simple library written in Rust for analyze sounds and generate wave data to display it. Now it's experimental use library and I've implemeneted only simple approach. It's experiment for analyze sounds in Rust and gain some knowledge of Web Assembly as a new big web feature. 
 
-  <strong>A template for kick starting a Rust and WebAssembly project using <a href="https://github.com/rustwasm/wasm-pack">wasm-pack</a>.</strong>
+## How to use
 
-  <p>
-    <a href="https://travis-ci.org/rustwasm/wasm-pack-template"><img src="https://img.shields.io/travis/rustwasm/wasm-pack-template.svg?style=flat-square" alt="Build Status" /></a>
-  </p>
+For use you need to install library from npm:
+```bash
+npm install wavy-sounds
+```
+Then you can use it in your project:
+```js
+import { parse_audio } from 'wavy-sounds';
 
-  <h3>
-    <a href="https://rustwasm.github.io/docs/wasm-pack/tutorials/npm-browser-packages/index.html">Tutorial</a>
-    <span> | </span>
-    <a href="https://discordapp.com/channels/442252698964721669/443151097398296587">Chat</a>
-  </h3>
+async function downloadAudioFile(url) {
+    const response = await fetch(url);
+    const arrayBuffer = await response.arrayBuffer();
+    return new Uint8Array(arrayBuffer);
+}
 
-  <sub>Built with 🦀🕸 by <a href="https://rustwasm.github.io/">The Rust and WebAssembly Working Group</a></sub>
-</div>
-
-## About
-
-[**📚 Read this template tutorial! 📚**][template-docs]
-
-This template is designed for compiling Rust libraries into WebAssembly and
-publishing the resulting package to NPM.
-
-Be sure to check out [other `wasm-pack` tutorials online][tutorials] for other
-templates and usages of `wasm-pack`.
-
-[tutorials]: https://rustwasm.github.io/docs/wasm-pack/tutorials/index.html
-[template-docs]: https://rustwasm.github.io/docs/wasm-pack/tutorials/npm-browser-packages/index.html
-
-## 🚴 Usage
-
-### 🐑 Use `cargo generate` to Clone this Template
-
-[Learn more about `cargo generate` here.](https://github.com/ashleygwilliams/cargo-generate)
+async function getSoundwave(audio_url) {
+    const audio = await downloadAudioFile(audio_url);
+    const result = parse_audio(audio);
+    console.log(result);
+}
 
 ```
-cargo generate --git https://github.com/rustwasm/wasm-pack-template.git --name my-project
-cd my-project
+
+Remember to parse data for parse_audio function as Uint8Array, it's important for correct analyze data.
+
+## Example output
+```json
+[
+    0.06449686735868454,
+    0,
+    0.009737508371472359,
+    -0.0006639050552621484,
+    0.0021148957312107086,
+    0.0008121852297335863,
+    -0.0003689117729663849,
+    -0.005668351426720619,
+    0.004233232699334621
+]
 ```
 
-### 🛠️ Build with `wasm-pack build`
+As you see, it's array of floats, which represents sound wave peaks. You can use it to display sound wave in your project.
 
-```
-wasm-pack build
-```
+## Performance
 
-### 🔬 Test in Headless Browsers with `wasm-pack test`
+Sound analyzing is quite high-consuming process. With big sound files I don't really know how time it will take to analyze it. I've tested it with small files which not take much time. I will try check and optimize it in the future.
+## Node
 
-```
-wasm-pack test --headless --firefox
-```
-
-### 🎁 Publish to NPM with `wasm-pack publish`
-
-```
-wasm-pack publish
-```
-
-## 🔋 Batteries Included
-
-* [`wasm-bindgen`](https://github.com/rustwasm/wasm-bindgen) for communicating
-  between WebAssembly and JavaScript.
-* [`console_error_panic_hook`](https://github.com/rustwasm/console_error_panic_hook)
-  for logging panic messages to the developer console.
-* [`wee_alloc`](https://github.com/rustwasm/wee_alloc), an allocator optimized
-  for small code size.
+It will be good approach to use it in Node.js environment, not especially in browser. It's because of performance and memory usage. Feel free to experiment and use it in your node.js projects.
