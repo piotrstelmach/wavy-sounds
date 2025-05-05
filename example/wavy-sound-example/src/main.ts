@@ -1,4 +1,4 @@
-import init, { parse_audio } from 'wavy-sounds'
+import init, {parse_audio} from 'wavy-sounds'
 import './style.css'
 
 await init();
@@ -18,41 +18,50 @@ function drawAudioWave(data: Float32Array | number[], canvas: HTMLCanvasElement)
     }
 
     const dataPoints = Array.from(data)
-    const totalBarsWidth = config.barWidth + config.barGap
-    const barsCount = Math.min(dataPoints.length, Math.floor(width / totalBarsWidth))
+    const totalBarsWidth = config.barWidth + config.barGap;
+    const barsCount = dataPoints.length;
+    canvas.width = barsCount * totalBarsWidth;
 
-    // Możemy użyć bezpośrednio znormalizowanych wartości
     const heightScale = (height / 2) * 0.9
 
-    // Gradient dla lepszego efektu wizualnego
     const gradient = ctx.createLinearGradient(0, 0, 0, height)
-    gradient.addColorStop(0, '#1976D2')
-    gradient.addColorStop(0.5, '#2196F3')
-    gradient.addColorStop(1, '#64B5F6')
+    gradient.addColorStop(0, '#0D47A1')  // głęboki niebieski
+    gradient.addColorStop(0.5, '#512DA8') // fiolet
+    gradient.addColorStop(1, '#00ACC1')  // błękit morski
     ctx.fillStyle = gradient
 
     for (let i = 0; i < barsCount; i++) {
-        const value = dataPoints[i]
+        const value = dataPoints[i] 
         if (Number.isFinite(value)) {
-            // Używamy znormalizowanej wartości (0-100) do określenia wysokości
-            const normalizedHeight = value / 100
-            const barHeight = Math.max(normalizedHeight * heightScale, config.minBarHeight)
+            // Logarytmiczna transformacja wartości amplitudy dla lepszej dynamiki wizualnej
+            const logValue = Math.log10(1 + value * 9);
+            const barHeight = Math.max(logValue * heightScale, config.minBarHeight);
             
-            const x = i * totalBarsWidth + (width - barsCount * totalBarsWidth) / 2
+            const x = i * totalBarsWidth;
             const y = height / 2
 
-            ctx.fillRect(x, y - barHeight, config.barWidth, barHeight)
-            ctx.fillRect(x, y, config.barWidth, barHeight * 0.8)
+            const radius = config.barWidth / 2;
+
+            ctx.beginPath();
+            ctx.roundRect?.(
+                x,
+                y - barHeight,                  // start od góry
+                config.barWidth,
+                barHeight * 2,                 // pełna wysokość (góra + dół)
+                radius
+            )
+            ctx.fill();
+
         }
     }
 }
 
-async function handleFile(file: File, canvas: HTMLCanvasElement, groupSize: number, debugInfo: HTMLPreElement) {
+async function handleFile(file: File, canvas: HTMLCanvasElement, debugInfo: HTMLPreElement) {
     try {
         const buffer = await file.arrayBuffer()
         const audioData = new Uint8Array(buffer)
         
-        const waveform = parse_audio(audioData, groupSize)
+        const waveform = parse_audio(audioData, 8)
 
       console.log('Raw waveform data:', waveform);
 
@@ -101,17 +110,11 @@ function main() {
     fileInput.type = 'file'
     fileInput.accept = 'audio/*'
 
-    const groupSizeInput = document.createElement('input')
-    groupSizeInput.type = 'number'
-    groupSizeInput.value = '8'
-    groupSizeInput.min = '1'
-
     const debugInfo = document.createElement('pre')
     debugInfo.style.textAlign = 'left'
     
     controls.appendChild(fileInput)
-    controls.appendChild(groupSizeInput)
-    
+
     container.appendChild(controls)
     container.appendChild(canvas)
     container.appendChild(debugInfo)
@@ -122,8 +125,8 @@ function main() {
         const file = (event.target as HTMLInputElement).files?.[0]
         if (!file) return
         
-        const groupSize = parseInt(groupSizeInput.value) || 8
-        await handleFile(file, canvas, groupSize, debugInfo)
+        // const groupSize = parseInt(groupSizeInput.value) || 8
+        await handleFile(file, canvas, debugInfo)
     })
 }
 
