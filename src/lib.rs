@@ -4,7 +4,6 @@ mod utils;
 mod error;
 
 use crate::audio::{decode_bytes, normalize_peaks};
-use std::sync::Arc;
 use wasm_bindgen::prelude::*;
 use error::Result;
 
@@ -19,7 +18,8 @@ pub fn main() {
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
-pub fn parse_audio(audio_data: &[u8]) -> Result<Vec<f32>> {
-    let decoded_bytes = decode_bytes(Arc::new(audio_data.to_vec()))?;
-    Ok(decoded_bytes)
+pub fn parse_audio(audio_data: &[u8], group_size: usize) -> Result<Vec<f32>> {
+    let decoded_bytes = decode_bytes(audio_data)?;
+    let normalized_peaks = normalize_peaks(&decoded_bytes, group_size)?;
+    Ok(normalized_peaks)
 }

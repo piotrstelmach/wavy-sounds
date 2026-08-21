@@ -9,6 +9,7 @@ pub enum AudioError {
     IOError,
     InvalidData,
     ProcessingError,
+    UnsupportedCodec,
 }
 
 impl Display for AudioError {
@@ -19,6 +20,7 @@ impl Display for AudioError {
             AudioError::IOError => write!(f, "IO error"),
             AudioError::InvalidData => write!(f, "Invalid data"),
             AudioError::ProcessingError => write!(f, "Processing error"),
+            AudioError::UnsupportedCodec => write!(f, "Unsupported codec"),
         }
     }
 }

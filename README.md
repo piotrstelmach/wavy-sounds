@@ -21,13 +21,16 @@ async function downloadAudioFile(url) {
 
 async function getSoundwave(audio_url) {
     const audio = await downloadAudioFile(audio_url);
-    const result = parse_audio(audio);
+    const groupSize = 8; // number of peaks to reduce into one point
+    const result = parse_audio(audio, groupSize);
     console.log(result);
 }
 
 ```
 
 Remember to parse data for parse_audio function as Uint8Array, it's important for correct analyze data.
+
+`group_size` controls how many consecutive peaks are reduced (by max) into a single output point — a larger value produces a shorter, coarser waveform.
 
 ## Example output
 ```json
