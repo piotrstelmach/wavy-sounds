@@ -13,10 +13,6 @@ pub fn main() {
     console_error_panic_hook::set_once();
 }
 
-#[cfg(feature = "wee_alloc")]
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
 #[wasm_bindgen]
 pub fn parse_audio(audio_data: &[u8], group_size: usize) -> Result<Vec<f32>> {
     let decoded_bytes = decode_bytes(audio_data)?;
