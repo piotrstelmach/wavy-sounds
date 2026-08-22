@@ -39,11 +39,15 @@ npm run build    # tsc && vite build
 Entry point `src/lib.rs` exposes a single `#[wasm_bindgen]` function, `parse_audio(audio_data: &[u8], group_size: usize) -> Result<Vec<f32>>`, which is the only public API surface consumed by JS.
 
 Pipeline modules under `src/`:
-- `audio/decoder.rs` (`decode_bytes`) — decodes raw bytes with `rodio::Decoder`, converts to `f32` samples, chunks them to ~20 points/second, computes RMS per chunk, and normalizes against the max RMS value.
+- `audio/decoder.rs` (`decode_bytes`) — demuxes/decodes raw bytes via `symphonia`, with a manual `opus-decoder` fallback for Opus tracks (symphonia has no working Opus decoder — see below), converts to `f32` samples, chunks them to ~20 points/second, computes RMS per chunk, and normalizes against the max RMS value. Decoding is zero-copy: `Cursor<&[u8]>` goes straight into symphonia's `MediaSourceStream`, no owned buffer of the input bytes is ever created.
 - `audio/processor.rs` (`normalize_peaks`) — takes the RMS-normalized peaks from `decode_bytes` and further reduces them by grouping every `group_size` peaks and taking the max per group. `parse_audio` calls `decode_bytes` then `normalize_peaks` in sequence.
-- `fft/transformer.rs` (`audio_fft`) — performs an FFT over samples using `rustfft`. Exported but not currently called from `lib.rs`. Treat it as available infrastructure for frequency-domain features, not part of the active pipeline.
+- `fft/transformer.rs` (`audio_fft`) — performs an FFT over samples using `rustfft`. Exported but not currently called from `lib.rs`. Treat it as available infrastructure for frequency-domain features, not part of the active pipeline. (Confirmed dead-code-eliminated by `wasm-opt` — it doesn't cost anything in the shipped `.wasm`.)
 - `error.rs` — defines `AudioError` (a `#[wasm_bindgen]` enum) and the crate's `Result<T>` alias; errors cross the WASM boundary as this enum.
 - `utils/panic.rs` — installs `console_error_panic_hook` (gated by the `console_error_panic_hook` feature, on by default) so Rust panics surface as browser console errors instead of opaque WASM traps.
+
+### Supported audio formats
+
+Deliberately trimmed to `mp3`, `wav`/`pcm`, and `mkv` (WebM/Opus) via `symphonia`'s feature flags in `Cargo.toml` (`default-features = false`) — these are the formats that actually show up in this library's use case (browser `MediaRecorder` output is WebM/Opus; common upload formats are MP3/WAV). FLAC, Vorbis/OGG, ADPCM, and AAC/MP4 are deliberately excluded: each one added 150–255KB to the release `.wasm` for formats unlikely to reach a browser waveform tool. Current release binary is ~560KB; the untrimmed set (all of the above enabled) was 1.42MB. Opus itself has no working decoder in symphonia (status is unimplemented upstream) — that's why `decoder.rs` special-cases it through the separate pure-Rust `opus-decoder` crate instead of symphonia's codec registry. Reconsider the trimmed set (or split into multiple builds) only if real user demand for FLAC/Vorbis/AAC shows up — don't re-add speculatively.
 
 ## CI/CD (`.github/workflows/ci.yml`)
 

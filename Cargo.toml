@@ -13,7 +13,7 @@ default = ["console_error_panic_hook"]
 [dependencies]
 wasm-bindgen = { version = "0.2.100", features = ["serde-serialize"] }
 rustfft = "6.2.0"
-symphonia = { version = "0.6.1", features = ["mp3", "isomp4", "aac"] }
+symphonia = { version = "0.6.1", default-features = false, features = ["mkv", "wav", "pcm", "mp3"] }
 opus-decoder = "0.1.1"
 
 # The `console_error_panic_hook` crate provides better debugging of panics by

@@ -49,6 +49,14 @@ Remember to parse data for parse_audio function as Uint8Array, it's important fo
 
 As you see, it's array of floats, which represents sound wave peaks. You can use it to display sound wave in your project.
 
+## Supported formats
+
+- MP3
+- WAV
+- WebM/Opus (e.g. audio recorded in-browser via `MediaRecorder`)
+
+Other formats (FLAC, Vorbis/OGG, AAC/MP4, etc.) aren't currently supported — `parse_audio` returns an `UnsupportedCodec` error for them. This set was chosen deliberately to keep the compiled `.wasm` small; see [CLAUDE.md](./CLAUDE.md) for the size trade-offs if you need a format that's missing.
+
 ## Performance
 
 Sound analyzing is quite high-consuming process. With big sound files I don't really know how time it will take to analyze it. I've tested it with small files which not take much time. I will try check and optimize it in the future.
