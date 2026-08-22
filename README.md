@@ -3,6 +3,8 @@
 ## Description
 Simple library written in Rust for analyze sounds and generate wave data to display it. Now it's experimental use library and I've implemeneted only simple approach. It's experiment for analyze sounds in Rust and gain some knowledge of Web Assembly as a new big web feature. 
 
+See [CHANGELOG.md](./CHANGELOG.md) for what's changed between versions.
+
 ## How to use
 
 For use you need to install library from npm:
@@ -35,19 +37,19 @@ Remember to parse data for parse_audio function as Uint8Array, it's important fo
 ## Example output
 ```json
 [
-    0.06449686735868454,
-    0,
-    0.009737508371472359,
-    -0.0006639050552621484,
-    0.0021148957312107086,
-    0.0008121852297335863,
-    -0.0003689117729663849,
-    -0.005668351426720619,
-    0.004233232699334621
+    0.1853021979331970,
+    0.6672140955924988,
+    0.9481893181800842,
+    1.0,
+    0.9284461140632629,
+    0.8760479688644409,
+    0.9147800803184509,
+    0.7912532687187195,
+    0.9998148083686829
 ]
 ```
 
-As you see, it's array of floats, which represents sound wave peaks. You can use it to display sound wave in your project.
+It's an array of floats in the `[0, 1]` range — each value is a normalized RMS amplitude peak for one time window of the audio. You can use it to display a sound wave in your project.
 
 ## Supported formats
 
@@ -60,6 +62,7 @@ Other formats (FLAC, Vorbis/OGG, AAC/MP4, etc.) aren't currently supported — `
 ## Performance
 
 Sound analyzing is quite high-consuming process. With big sound files I don't really know how time it will take to analyze it. I've tested it with small files which not take much time. I will try check and optimize it in the future.
-## Node
 
-It will be good approach to use it in Node.js environment, not especially in browser. It's because of performance and memory usage. Feel free to experiment and use it in your node.js projects.
+## Browser vs. Node
+
+This library is built for the browser: it's a WASM library (`wasm-pack build --target bundler`), and its whole point is doing the waveform-decoding work in an environment that can't run native code otherwise. If you're running in Node, a native addon (e.g. via `napi-rs`) would outperform this — no WASM-boundary copy, no sandboxing overhead — since Node already has access to the OS. Node isn't unsupported, but the browser is the intended environment.
