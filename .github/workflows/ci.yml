@@ -43,7 +43,12 @@ jobs:
         run: cargo test --target x86_64-unknown-linux-gnu --test decode_regression
 
       - name: Install wasm-pack
-        run: cargo install wasm-pack --version ${{ env.WASM_PACK_VERSION }} --locked
+        # ~/.cargo/bin is cached above, so skip reinstalling on a cache hit -
+        # `cargo install` without --force errors if the binary is already there.
+        run: |
+          if ! wasm-pack --version 2>/dev/null | grep -q "${{ env.WASM_PACK_VERSION }}"; then
+            cargo install wasm-pack --version ${{ env.WASM_PACK_VERSION }} --locked --force
+          fi
 
       - name: Build with wasm-pack
         run: wasm-pack build --release --target bundler
