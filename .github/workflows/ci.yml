@@ -95,7 +95,7 @@ jobs:
 
   deploy-example:
     needs: build-wasm
-    if: github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     name: Deploy example (GH Pages)
     environment:

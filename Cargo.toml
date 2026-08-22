@@ -3,6 +3,9 @@ name = "wavy-sounds"
 version = "2.0.0"
 authors = ["piotrstelmach <piotrstelmach135@gmail.com>"]
 edition = "2018"
+description = "Decodes an audio file to a normalized waveform peak array (Rust/WASM)"
+repository = "https://github.com/piotrstelmach/wavy-sounds"
+license = "MIT OR Apache-2.0"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
