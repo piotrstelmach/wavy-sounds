@@ -10,7 +10,8 @@
   },
   "devDependencies": {
     "typescript": "~5.7.2",
-    "vite": "^6.3.1"
+    "vite": "^6.3.1",
+    "vite-plugin-wasm": "^3.6.0"
   },
   "dependencies": {
     "wavy-sounds": "file:../../pkg/"

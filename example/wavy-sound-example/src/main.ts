@@ -1,7 +1,5 @@
-import init, {parse_audio} from 'wavy-sounds'
+import {parse_audio} from 'wavy-sounds'
 import './style.css'
-
-await init();
 
 function drawAudioWave(data: Float32Array | number[], canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext('2d')

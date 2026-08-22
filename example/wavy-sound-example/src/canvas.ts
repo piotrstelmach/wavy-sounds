@@ -1,6 +1,5 @@
 import './style.css';
 import { parse_audio } from 'wavy-sounds';
-import init from 'wavy-sounds';
 
 function createCanvas(width: number, height: number): [HTMLCanvasElement, CanvasRenderingContext2D] {
   const canvas = document.createElement('canvas');
@@ -81,9 +80,6 @@ function createControlsContainer(): HTMLDivElement {
 }
 
 async function setupApp() {
-  // Initialize WASM module
-  await init();
-
   const app = document.getElementById('app');
   if (!app) throw new Error('No app container found');
 
